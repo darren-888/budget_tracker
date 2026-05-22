@@ -55,9 +55,9 @@ export default function Dashboard({ settings, transactions, onUpdateSettings, on
       {/* ── Header ── */}
       <header style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '1rem 1rem 0.75rem',
+        padding: 'calc(env(safe-area-inset-top, 0px) + 1rem) 1rem 0.75rem',
         borderBottom: '1px solid var(--border-color)',
-        position: 'sticky', top: 0, zIndex: 40,
+        position: 'sticky', top: 'env(safe-area-inset-top, 0px)', zIndex: 40,
         background: 'rgba(2,6,23,0.9)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
