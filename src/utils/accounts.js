@@ -34,3 +34,10 @@ export function computeNetWorth(accounts) {
     return sum + Number(acc.balance || 0)
   }, 0)
 }
+
+/**
+ * Compute absolute total net worth (including excluded accounts).
+ */
+export function computeTotalNetWorth(accounts) {
+  return accounts.reduce((sum, acc) => sum + Number(acc.balance || 0), 0)
+}

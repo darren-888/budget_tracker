@@ -8,7 +8,7 @@ import NetWorthManager, { AccountIcon } from './NetWorthManager'
 import { DEFAULT_CATEGORIES } from '../utils/categories'
 import { formatPHP, getSpendStatus, computeWeeklySpent } from '../utils/calculations'
 import { getThisWeekStart, getThisWeekEnd } from '../utils/dateUtils'
-import { computeNetWorth, getAccountPreset } from '../utils/accounts'
+import { computeNetWorth, computeTotalNetWorth, getAccountPreset } from '../utils/accounts'
 
 export default function Dashboard({ settings, transactions, accounts, onUpdateSettings, onAddTransaction, onDeleteTransaction, onUpdateAccounts, onReset }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -36,6 +36,7 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
   const spendStatus = getSpendStatus(weeklySpent, limit)
 
   const netWorth = useMemo(() => computeNetWorth(accounts), [accounts])
+  const totalNetWorth = useMemo(() => computeTotalNetWorth(accounts), [accounts])
 
   const handleAddExpense = ({ amount, category, note, accountId }) => {
     onAddTransaction({
@@ -146,7 +147,7 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
         {/* Balance Hero */}
         <div className="animate-fade-up stagger-1" style={{ marginBottom: '1.25rem' }}>
           <p style={{ fontSize: '0.8rem', color: 'var(--hero-muted)', fontWeight: 500, marginBottom: '0.3rem' }}>
-            Total Net Worth
+            Spendable Net Worth
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span style={{
@@ -312,7 +313,7 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
                   Total Net Worth
                 </span>
                 <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--accent)' }}>
-                  {balanceVisible ? formatPHP(netWorth) : '₱ ••••••'}
+                  {balanceVisible ? formatPHP(totalNetWorth) : '₱ ••••••'}
                 </span>
               </div>
             </div>
