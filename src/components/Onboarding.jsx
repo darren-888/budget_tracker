@@ -3,7 +3,6 @@ import { Wallet, ChevronRight } from 'lucide-react'
 
 export default function Onboarding({ onComplete }) {
   const [form, setForm] = useState({
-    startingBalance: '',
     weeklyAllowance: '',
     weeklySpendLimit: '',
   })
@@ -11,8 +10,6 @@ export default function Onboarding({ onComplete }) {
 
   const validate = () => {
     const errs = {}
-    if (!form.startingBalance || isNaN(form.startingBalance) || Number(form.startingBalance) < 0)
-      errs.startingBalance = 'Enter a valid amount'
     if (!form.weeklyAllowance || isNaN(form.weeklyAllowance) || Number(form.weeklyAllowance) <= 0)
       errs.weeklyAllowance = 'Enter a valid weekly allowance'
     if (!form.weeklySpendLimit || isNaN(form.weeklySpendLimit) || Number(form.weeklySpendLimit) <= 0)
@@ -25,7 +22,7 @@ export default function Onboarding({ onComplete }) {
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
     onComplete({
-      startingBalance: Number(form.startingBalance),
+      startingBalance: 0,
       weeklyAllowance: Number(form.weeklyAllowance),
       weeklySpendLimit: Number(form.weeklySpendLimit),
       customCategories: [],
@@ -88,25 +85,6 @@ export default function Onboarding({ onComplete }) {
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <FieldGroup
-            label="Starting Savings Balance"
-            hint="How much do you have saved right now?"
-            error={errors.startingBalance}
-          >
-            <div style={{ position: 'relative' }}>
-              <span style={{
-                position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)',
-                color: 'var(--accent)', fontWeight: 600, fontSize: '0.875rem'
-              }}>₱</span>
-              <input
-                type="text" inputMode="decimal" placeholder="19000"
-                className="app-input"
-                style={{ paddingLeft: '2rem' }}
-                value={form.startingBalance}
-                onChange={e => handleChange('startingBalance', e.target.value)}
-              />
-            </div>
-          </FieldGroup>
 
           <FieldGroup
             label="Weekly Allowance"

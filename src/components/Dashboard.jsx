@@ -5,7 +5,7 @@ import QuickLogBar from './QuickLogBar'
 import SettingsDialog from './SettingsDialog'
 import NetWorthManager, { AccountIcon } from './NetWorthManager'
 import { DEFAULT_CATEGORIES } from '../utils/categories'
-import { formatPHP, computeNetSavings, computeTotalAllowanceReceived, computeTotalExpenses, getSpendStatus, computeWeeklySpent } from '../utils/calculations'
+import { formatPHP, getSpendStatus, computeWeeklySpent } from '../utils/calculations'
 import { getThisWeekStart, getThisWeekEnd } from '../utils/dateUtils'
 import { computeNetWorth, getAccountPreset } from '../utils/accounts'
 
@@ -25,12 +25,6 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
   const allCategories = [...DEFAULT_CATEGORIES, ...(settings.customCategories || [])]
 
   // Computed values
-  const totalAllowanceReceived = useMemo(() => computeTotalAllowanceReceived(transactions), [transactions])
-  const totalExpenses = useMemo(() => computeTotalExpenses(transactions), [transactions])
-  const netSavings = useMemo(
-    () => computeNetSavings({ startingBalance: settings.startingBalance, totalAllowanceReceived, totalExpenses }),
-    [settings.startingBalance, totalAllowanceReceived, totalExpenses]
-  )
 
   const weekStart = useMemo(() => getThisWeekStart(), [])
   const weekEnd = useMemo(() => getThisWeekEnd(), [])
@@ -131,14 +125,14 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
         {/* Balance Hero */}
         <div className="animate-fade-up stagger-1" style={{ marginBottom: '1.25rem' }}>
           <p style={{ fontSize: '0.8rem', color: 'var(--hero-muted)', fontWeight: 500, marginBottom: '0.3rem' }}>
-            {accounts.length > 0 ? 'Total Net Worth' : 'Track Your Financial Goals'}
+            Total Net Worth
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span style={{
               fontSize: '2.2rem', fontWeight: 800, color: '#f1f5f9',
               letterSpacing: '-1px',
             }}>
-              {balanceVisible ? formatPHP(accounts.length > 0 ? netWorth : netSavings) : '₱ ••••••'}
+              {balanceVisible ? formatPHP(netWorth) : '₱ ••••••'}
             </span>
             <button
               onClick={() => setBalanceVisible(!balanceVisible)}

@@ -41,7 +41,6 @@ function SettingsField({ label, fieldKey, form, errors, setForm, setErrors }) {
 
 export default function SettingsDialog({ isOpen, onClose, settings, onSave, onReset }) {
   const [form, setForm] = useState({
-    startingBalance: settings.startingBalance,
     weeklyAllowance: settings.weeklyAllowance,
     weeklySpendLimit: settings.weeklySpendLimit,
     customCategories: [...(settings.customCategories || [])],
@@ -53,7 +52,6 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
   // Sync form values when settings change externally
   useEffect(() => {
     setForm({
-      startingBalance: settings.startingBalance,
       weeklyAllowance: settings.weeklyAllowance,
       weeklySpendLimit: settings.weeklySpendLimit,
       customCategories: [...(settings.customCategories || [])],
@@ -66,8 +64,6 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
 
   const validate = () => {
     const errs = {}
-    if (form.startingBalance === '' || isNaN(Number(form.startingBalance)))
-      errs.startingBalance = 'Enter a valid number'
     if (!form.weeklyAllowance || isNaN(Number(form.weeklyAllowance)) || Number(form.weeklyAllowance) <= 0)
       errs.weeklyAllowance = 'Enter a valid amount'
     if (!form.weeklySpendLimit || isNaN(Number(form.weeklySpendLimit)) || Number(form.weeklySpendLimit) <= 0)
@@ -80,7 +76,6 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
     if (Object.keys(errs).length) { setErrors(errs); return }
     onSave({
       ...settings,
-      startingBalance: Number(form.startingBalance),
       weeklyAllowance: Number(form.weeklyAllowance),
       weeklySpendLimit: Number(form.weeklySpendLimit),
       customCategories: form.customCategories,
@@ -139,7 +134,7 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
           }}>
             Budget Settings
           </p>
-          <SettingsField label="Starting Savings Balance" fieldKey="startingBalance" form={form} errors={errors} setForm={setForm} setErrors={setErrors} />
+
           <SettingsField label="Weekly Allowance" fieldKey="weeklyAllowance" form={form} errors={errors} setForm={setForm} setErrors={setErrors} />
           <SettingsField label="Weekly Spend Limit" fieldKey="weeklySpendLimit" form={form} errors={errors} setForm={setForm} setErrors={setErrors} />
         </div>
