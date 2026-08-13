@@ -131,14 +131,14 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
         {/* Balance Hero */}
         <div className="animate-fade-up stagger-1" style={{ marginBottom: '1.25rem' }}>
           <p style={{ fontSize: '0.8rem', color: 'var(--hero-muted)', fontWeight: 500, marginBottom: '0.3rem' }}>
-            Track Your Financial Goals
+            {accounts.length > 0 ? 'Total Net Worth' : 'Track Your Financial Goals'}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span style={{
               fontSize: '2.2rem', fontWeight: 800, color: '#f1f5f9',
               letterSpacing: '-1px',
             }}>
-              {balanceVisible ? formatPHP(netSavings) : '₱ ••••••'}
+              {balanceVisible ? formatPHP(accounts.length > 0 ? netWorth : netSavings) : '₱ ••••••'}
             </span>
             <button
               onClick={() => setBalanceVisible(!balanceVisible)}
