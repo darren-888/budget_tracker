@@ -283,7 +283,10 @@ html, body, #root {
   width: 100%;
   max-width: 480px;
   max-height: 90dvh;
+  max-height: 90vh; /* fallback */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 1.5rem;
   padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
   animation: slide-up 0.3s cubic-bezier(0.33, 1, 0.68, 1);

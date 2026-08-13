@@ -44,8 +44,8 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
 
   const handleAddPresetAccount = () => {
     if (!selectedPreset) return
-    const bal = parseFloat(addPresetBalance)
-    if (isNaN(bal) || bal < 0) return
+    const bal = parseFloat(addPresetBalance) || 0
+    if (bal < 0) return
     const newAcc = {
       id: Date.now().toString() + Math.random().toString(36).slice(2),
       presetId: selectedPreset.id,
@@ -61,8 +61,8 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
 
   const handleAddCustom = () => {
     if (!customName.trim()) return
-    const bal = parseFloat(customBalance)
-    if (isNaN(bal) || bal < 0) return
+    const bal = parseFloat(customBalance) || 0
+    if (bal < 0) return
     const newAcc = {
       id: Date.now().toString() + Math.random().toString(36).slice(2),
       name: customName.trim(),
@@ -96,7 +96,7 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
 
   return (
     <div className="dialog-overlay" onClick={onClose}>
-      <div className="dialog-content" onClick={e => e.stopPropagation()} style={{ maxHeight: '92dvh' }}>
+      <div className="dialog-content" onClick={e => e.stopPropagation()} style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
