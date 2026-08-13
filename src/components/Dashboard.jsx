@@ -15,6 +15,7 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
   const [showAllowanceModal, setShowAllowanceModal] = useState(false)
   const [allowanceAmount, setAllowanceAmount] = useState(String(settings.weeklyAllowance))
   const [allowanceNote, setAllowanceNote] = useState('')
+  const [allowanceAccountId, setAllowanceAccountId] = useState('')
   const [allowanceError, setAllowanceError] = useState('')
   const [balanceVisible, setBalanceVisible] = useState(true)
   const [showAllTransactions, setShowAllTransactions] = useState(false)
@@ -35,15 +36,22 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
 
   const netWorth = useMemo(() => computeNetWorth(accounts), [accounts])
 
-  const handleAddExpense = ({ amount, category, note }) => {
+  const handleAddExpense = ({ amount, category, note, accountId }) => {
     onAddTransaction({
       id: Date.now().toString() + Math.random().toString(36).slice(2),
       type: 'expense',
       amount,
       category,
       note,
+      accountId: accountId || null,
       date: new Date().toISOString(),
     })
+    // Deduct from selected account
+    if (accountId) {
+      onUpdateAccounts(accounts.map(a =>
+        a.id === accountId ? { ...a, balance: Math.max(0, a.balance - amount) } : a
+      ))
+    }
   }
 
   const handleAddAllowance = () => {
@@ -52,16 +60,28 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
       setAllowanceError('Enter a valid amount')
       return
     }
+    if (accounts.length > 0 && !allowanceAccountId) {
+      setAllowanceError('Select an account')
+      return
+    }
     onAddTransaction({
       id: Date.now().toString() + Math.random().toString(36).slice(2),
       type: 'allowance',
       amount: num,
       note: allowanceNote.trim(),
+      accountId: allowanceAccountId || null,
       date: new Date().toISOString(),
     })
+    // Add to selected account
+    if (allowanceAccountId) {
+      onUpdateAccounts(accounts.map(a =>
+        a.id === allowanceAccountId ? { ...a, balance: a.balance + num } : a
+      ))
+    }
     setShowAllowanceModal(false)
     setAllowanceAmount(String(settings.weeklyAllowance))
     setAllowanceNote('')
+    setAllowanceAccountId('')
     setAllowanceError('')
   }
 
@@ -359,7 +379,7 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
       </main>
 
       {/* ── Fixed Bottom Bar ── */}
-      <QuickLogBar allCategories={allCategories} onAdd={handleAddExpense} />
+      <QuickLogBar allCategories={allCategories} accounts={accounts} onAdd={handleAddExpense} />
 
       {/* ── Allowance Modal ── */}
       {showAllowanceModal && (
@@ -406,6 +426,26 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
                 <p style={{ fontSize: '0.72rem', color: 'var(--red)', marginTop: '0.3rem' }}>⚠ {allowanceError}</p>
               )}
             </div>
+
+            {/* Account selector for allowance */}
+            {accounts.length > 0 && (
+              <div style={{ marginBottom: '0.75rem' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
+                  Add to account
+                </label>
+                <select
+                  className="app-input"
+                  style={{ appearance: 'none', cursor: 'pointer' }}
+                  value={allowanceAccountId}
+                  onChange={e => setAllowanceAccountId(e.target.value)}
+                >
+                  <option value="">Select account…</option>
+                  {accounts.map(acc => (
+                    <option key={acc.id} value={acc.id}>{acc.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>

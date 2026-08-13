@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { PlusCircle, ChevronUp, X } from 'lucide-react'
+import { PlusCircle, ChevronUp, X, Wallet } from 'lucide-react'
 import { getCategoryMeta } from '../utils/categories'
+import { getAccountPreset } from '../utils/accounts'
 
-export default function QuickLogBar({ allCategories, onAdd }) {
+export default function QuickLogBar({ allCategories, accounts, onAdd }) {
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState(allCategories[0] || 'Food')
   const [note, setNote] = useState('')
+  const [accountId, setAccountId] = useState(accounts?.[0]?.id || '')
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState('')
 
@@ -16,7 +18,11 @@ export default function QuickLogBar({ allCategories, onAdd }) {
       setError('Enter a valid amount')
       return
     }
-    onAdd({ amount: num, category, note: note.trim() })
+    if (accounts.length > 0 && !accountId) {
+      setError('Select an account')
+      return
+    }
+    onAdd({ amount: num, category, note: note.trim(), accountId: accountId || null })
     setAmount('')
     setNote('')
     setError('')
@@ -24,6 +30,10 @@ export default function QuickLogBar({ allCategories, onAdd }) {
   }
 
   const meta = getCategoryMeta(category)
+
+  // Get selected account preset for icon display
+  const selectedAccount = accounts.find(a => a.id === accountId)
+  const selectedPreset = selectedAccount ? getAccountPreset(selectedAccount.presetId || selectedAccount.name) : null
 
   return (
     <div className="bottom-bar">
@@ -101,7 +111,7 @@ export default function QuickLogBar({ allCategories, onAdd }) {
             </div>
 
             {/* Category select */}
-            <div style={{ position: 'relative', minWidth: 130 }}>
+            <div style={{ position: 'relative', minWidth: 120 }}>
               <div style={{
                 position: 'absolute', left: '0.65rem', top: '50%', transform: 'translateY(-50%)',
                 fontSize: '1rem', zIndex: 1, pointerEvents: 'none',
@@ -120,6 +130,33 @@ export default function QuickLogBar({ allCategories, onAdd }) {
               </select>
             </div>
           </div>
+
+          {/* Account selector */}
+          {accounts.length > 0 && (
+            <div style={{ marginBottom: '0.6rem' }}>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>
+                Deduct from
+              </label>
+              <div style={{ position: 'relative' }}>
+                <div style={{
+                  position: 'absolute', left: '0.65rem', top: '50%', transform: 'translateY(-50%)',
+                  zIndex: 1, pointerEvents: 'none',
+                }}>
+                  <Wallet size={14} color="var(--accent)" />
+                </div>
+                <select
+                  className="app-input"
+                  style={{ paddingLeft: '2rem', appearance: 'none', cursor: 'pointer', fontSize: '0.85rem' }}
+                  value={accountId}
+                  onChange={e => setAccountId(e.target.value)}
+                >
+                  {accounts.map(acc => (
+                    <option key={acc.id} value={acc.id}>{acc.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           {/* Note */}
           <div style={{ marginBottom: '0.75rem' }}>
