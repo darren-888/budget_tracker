@@ -12,15 +12,8 @@ export function WalletSection({ transactions }) {
   return (
     <div className="wallet-grid animate-fade-up stagger-3">
       <div className="wallet-card">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="wallet-icon" style={{ background: 'var(--green-bg)' }}>
-            <ArrowDownLeft size={18} color="var(--green)" />
-          </div>
-          <div style={{
-            width: 6, height: 6, borderRadius: '50%', background: 'var(--border-color)',
-            cursor: 'pointer',
-            boxShadow: '10px 0 0 var(--border-color), 20px 0 0 var(--border-color)',
-          }} />
+        <div className="wallet-icon" style={{ background: 'var(--green-bg)' }}>
+          <ArrowDownLeft size={18} color="var(--green)" />
         </div>
         <div>
           <p className="wallet-label">Income</p>
@@ -29,15 +22,8 @@ export function WalletSection({ transactions }) {
       </div>
 
       <div className="wallet-card">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="wallet-icon" style={{ background: 'var(--red-bg)' }}>
-            <ArrowUpRight size={18} color="var(--red)" />
-          </div>
-          <div style={{
-            width: 6, height: 6, borderRadius: '50%', background: 'var(--border-color)',
-            cursor: 'pointer',
-            boxShadow: '10px 0 0 var(--border-color), 20px 0 0 var(--border-color)',
-          }} />
+        <div className="wallet-icon" style={{ background: 'var(--red-bg)' }}>
+          <ArrowUpRight size={18} color="var(--red)" />
         </div>
         <div>
           <p className="wallet-label">Spending</p>
