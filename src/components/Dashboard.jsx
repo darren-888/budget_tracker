@@ -170,6 +170,23 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
                 : <EyeOff size={14} color="var(--hero-muted)" />}
             </button>
           </div>
+
+          {/* Only show raw total if it differs from spendable total */}
+          {totalNetWorth !== netWorth && (
+            <div className="animate-scale-in" style={{ 
+              display: 'inline-flex', alignItems: 'center', gap: '0.5rem', 
+              padding: '0.3rem 0.75rem', background: 'rgba(255,255,255,0.06)', 
+              borderRadius: '999px', marginTop: '0.6rem',
+              border: '1px solid rgba(255,255,255,0.04)',
+            }}>
+              <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', fontWeight: 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Total Net Worth
+              </span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f1f5f9' }}>
+                {balanceVisible ? formatPHP(totalNetWorth) : '₱ ••••••'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Spending Limit Bar */}
