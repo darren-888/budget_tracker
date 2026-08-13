@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { PlusCircle, ChevronDown } from 'lucide-react'
+import { PlusCircle, ChevronUp, X } from 'lucide-react'
 import { getCategoryMeta } from '../utils/categories'
 
 export default function QuickLogBar({ allCategories, onAdd }) {
@@ -34,50 +34,51 @@ export default function QuickLogBar({ allCategories, onAdd }) {
             onClick={() => setIsOpen(true)}
             style={{
               width: '100%',
-              background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.1))',
-              border: '1px solid rgba(16,185,129,0.3)',
+              background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
+              border: 'none',
               borderRadius: '0.875rem',
-              padding: '0.8rem 1.25rem',
+              padding: '0.85rem 1.25rem',
               display: 'flex', alignItems: 'center', gap: '0.75rem',
               cursor: 'pointer',
               transition: 'all 0.2s',
+              boxShadow: '0 2px 12px rgba(79, 70, 229, 0.3)',
             }}
           >
             <div style={{
-              width: 34, height: 34, borderRadius: '0.625rem',
-              background: 'rgba(16,185,129,0.2)',
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <PlusCircle size={19} color="#10b981" />
+              <PlusCircle size={20} color="#fff" />
             </div>
             <div style={{ textAlign: 'left', flex: 1 }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>
                 Log an expense
               </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.7)' }}>
                 Tap to add a new transaction
               </div>
             </div>
-            <ChevronDown size={18} color="var(--text-secondary)" />
+            <ChevronUp size={18} color="rgba(255,255,255,0.6)" />
           </button>
         </div>
       )}
 
       {/* Expanded form */}
       {isOpen && (
-        <form onSubmit={handleSubmit} style={{ padding: '1rem' }}>
+        <form onSubmit={handleSubmit} className="animate-slide-up" style={{ padding: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
-            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Log Expense</span>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>Log Expense</span>
             <button
               type="button"
               onClick={() => { setIsOpen(false); setError('') }}
               style={{
-                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)',
-                borderRadius: '0.5rem', padding: '4px 10px', cursor: 'pointer',
-                fontSize: '0.75rem', color: 'var(--text-secondary)',
+                background: 'var(--bg-input)', border: '1px solid var(--border-color)',
+                borderRadius: '50%', width: 30, height: 30, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              Cancel
+              <X size={14} color="var(--text-secondary)" />
             </button>
           </div>
 
@@ -133,7 +134,7 @@ export default function QuickLogBar({ allCategories, onAdd }) {
           </div>
 
           {error && (
-            <p style={{ fontSize: '0.75rem', color: '#fb7185', marginBottom: '0.5rem' }}>⚠ {error}</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--red)', marginBottom: '0.5rem' }}>⚠ {error}</p>
           )}
 
           <button type="submit" className="btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>

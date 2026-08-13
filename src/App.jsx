@@ -5,10 +5,12 @@ import Dashboard from './components/Dashboard'
 
 const SETTINGS_KEY = 'budgettracker_settings'
 const TRANSACTIONS_KEY = 'budgettracker_transactions'
+const ACCOUNTS_KEY = 'budgettracker_accounts'
 
 export default function App() {
   const [settings, setSettings] = useLocalStorage(SETTINGS_KEY, null)
   const [transactions, setTransactions] = useLocalStorage(TRANSACTIONS_KEY, [])
+  const [accounts, setAccounts] = useLocalStorage(ACCOUNTS_KEY, [])
 
   const handleOnboardingComplete = (newSettings) => {
     setSettings(newSettings)
@@ -26,12 +28,17 @@ export default function App() {
     setTransactions(prev => prev.filter(tx => tx.id !== id))
   }
 
+  const handleUpdateAccounts = (updatedAccounts) => {
+    setAccounts(updatedAccounts)
+  }
+
   const handleReset = () => {
     setSettings(null)
     setTransactions([])
-    // Clear localStorage explicitly
+    setAccounts([])
     localStorage.removeItem(SETTINGS_KEY)
     localStorage.removeItem(TRANSACTIONS_KEY)
+    localStorage.removeItem(ACCOUNTS_KEY)
   }
 
   if (!settings) {
@@ -42,9 +49,11 @@ export default function App() {
     <Dashboard
       settings={settings}
       transactions={transactions}
+      accounts={accounts}
       onUpdateSettings={handleUpdateSettings}
       onAddTransaction={handleAddTransaction}
       onDeleteTransaction={handleDeleteTransaction}
+      onUpdateAccounts={handleUpdateAccounts}
       onReset={handleReset}
     />
   )

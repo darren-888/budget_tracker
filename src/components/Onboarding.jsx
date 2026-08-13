@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Wallet, ChevronRight } from 'lucide-react'
-import { DEFAULT_CATEGORIES } from '../utils/categories'
 
 export default function Onboarding({ onComplete }) {
   const [form, setForm] = useState({
@@ -43,7 +42,7 @@ export default function Onboarding({ onComplete }) {
     <div
       style={{
         minHeight: '100dvh',
-        background: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%)',
+        background: 'linear-gradient(135deg, #f0f2f8 0%, #e8e6f5 50%, #f0f2f8 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -56,15 +55,19 @@ export default function Onboarding({ onComplete }) {
         <div
           style={{
             width: 72, height: 72, borderRadius: '1.25rem',
-            background: 'linear-gradient(135deg, #10b981, #059669)',
+            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 1rem',
-            boxShadow: '0 0 32px rgba(16,185,129,0.35)',
+            boxShadow: '0 8px 32px rgba(79,70,229,0.3)',
           }}
         >
           <Wallet size={36} color="#fff" />
         </div>
-        <h1 className="gradient-text" style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.4rem' }}>
+        <h1 style={{
+          fontSize: '1.75rem', fontWeight: 800,
+          color: 'var(--text-primary)',
+          marginBottom: '0.4rem',
+        }}>
           Budget Tracker
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
@@ -74,10 +77,10 @@ export default function Onboarding({ onComplete }) {
 
       {/* Setup Card */}
       <div
-        className="glass-card animate-fade-up stagger-1"
+        className="card animate-fade-up stagger-1"
         style={{ width: '100%', maxWidth: 420, padding: '1.75rem' }}
       >
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
           Let's set up your budget
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.825rem', marginBottom: '1.5rem' }}>
@@ -145,13 +148,19 @@ export default function Onboarding({ onComplete }) {
             </div>
           </FieldGroup>
 
-          <button type="submit" className="btn-primary" style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <button type="submit" className="btn-primary" style={{
+            marginTop: '0.5rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+          }}>
             Get Started <ChevronRight size={18} />
           </button>
         </form>
       </div>
 
-      <p className="animate-fade-up stagger-2" style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '1.5rem', textAlign: 'center' }}>
+      <p className="animate-fade-up stagger-2" style={{
+        color: 'var(--text-secondary)', fontSize: '0.75rem',
+        marginTop: '1.5rem', textAlign: 'center',
+      }}>
         You can edit these anytime via Settings ⚙️
       </p>
     </div>
@@ -161,7 +170,10 @@ export default function Onboarding({ onComplete }) {
 function FieldGroup({ label, hint, error, children }) {
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.3rem' }}>
+      <label style={{
+        display: 'block', fontSize: '0.8rem', fontWeight: 600,
+        color: 'var(--text-primary)', marginBottom: '0.3rem',
+      }}>
         {label}
       </label>
       {hint && (
@@ -169,7 +181,7 @@ function FieldGroup({ label, hint, error, children }) {
       )}
       {children}
       {error && (
-        <p style={{ fontSize: '0.72rem', color: '#fb7185', marginTop: '0.3rem' }}>⚠ {error}</p>
+        <p style={{ fontSize: '0.72rem', color: 'var(--red)', marginTop: '0.3rem' }}>⚠ {error}</p>
       )}
     </div>
   )

@@ -1,19 +1,45 @@
-import React, { useState } from 'react'
-import { Settings, Wallet, PlusCircle } from 'lucide-react'
-import { NetSavingsCard, WeeklySpendingCard, TransactionFeed } from './Cards'
+import React, { useState, useMemo, useRef } from 'react'
+import { Settings, PlusCircle, Wallet, Eye, EyeOff, Target, Clock, LayoutGrid, DollarSign } from 'lucide-react'
+import { WalletSection, WeeklySpendingCard, TransactionFeed } from './Cards'
 import QuickLogBar from './QuickLogBar'
 import SettingsDialog from './SettingsDialog'
+import NetWorthManager, { AccountIcon } from './NetWorthManager'
 import { DEFAULT_CATEGORIES } from '../utils/categories'
-import { formatPHP } from '../utils/calculations'
+import { formatPHP, computeNetSavings, computeTotalAllowanceReceived, computeTotalExpenses, getSpendStatus, computeWeeklySpent } from '../utils/calculations'
+import { getThisWeekStart, getThisWeekEnd } from '../utils/dateUtils'
+import { computeNetWorth, getAccountPreset } from '../utils/accounts'
 
-export default function Dashboard({ settings, transactions, onUpdateSettings, onAddTransaction, onDeleteTransaction, onReset }) {
+export default function Dashboard({ settings, transactions, accounts, onUpdateSettings, onAddTransaction, onDeleteTransaction, onUpdateAccounts, onReset }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [accountsOpen, setAccountsOpen] = useState(false)
   const [showAllowanceModal, setShowAllowanceModal] = useState(false)
   const [allowanceAmount, setAllowanceAmount] = useState(String(settings.weeklyAllowance))
   const [allowanceNote, setAllowanceNote] = useState('')
   const [allowanceError, setAllowanceError] = useState('')
+  const [balanceVisible, setBalanceVisible] = useState(true)
+  const [showAllTransactions, setShowAllTransactions] = useState(false)
+
+  const historyRef = useRef(null)
+  const budgetRef = useRef(null)
 
   const allCategories = [...DEFAULT_CATEGORIES, ...(settings.customCategories || [])]
+
+  // Computed values
+  const totalAllowanceReceived = useMemo(() => computeTotalAllowanceReceived(transactions), [transactions])
+  const totalExpenses = useMemo(() => computeTotalExpenses(transactions), [transactions])
+  const netSavings = useMemo(
+    () => computeNetSavings({ startingBalance: settings.startingBalance, totalAllowanceReceived, totalExpenses }),
+    [settings.startingBalance, totalAllowanceReceived, totalExpenses]
+  )
+
+  const weekStart = useMemo(() => getThisWeekStart(), [])
+  const weekEnd = useMemo(() => getThisWeekEnd(), [])
+  const weeklySpent = useMemo(() => computeWeeklySpent(transactions, weekStart, weekEnd), [transactions, weekStart, weekEnd])
+  const limit = Number(settings.weeklySpendLimit)
+  const spendPct = limit > 0 ? Math.min((weeklySpent / limit) * 100, 100) : 0
+  const spendStatus = getSpendStatus(weeklySpent, limit)
+
+  const netWorth = useMemo(() => computeNetWorth(accounts), [accounts])
 
   const handleAddExpense = ({ amount, category, note }) => {
     onAddTransaction({
@@ -49,120 +75,292 @@ export default function Dashboard({ settings, transactions, onUpdateSettings, on
     <div style={{
       minHeight: '100dvh',
       paddingTop: 'env(safe-area-inset-top, 0px)',
-      background: 'linear-gradient(180deg, #020617 0%, #0a1628 100%)',
+      background: 'var(--bg-base)',
       display: 'flex',
       flexDirection: 'column',
     }}>
-      {/* ── Header ── */}
-      <header style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '1rem 1rem 0.75rem',
-        borderBottom: '1px solid var(--border-color)',
-        position: 'sticky', top: 0, zIndex: 40,
-        background: 'rgba(2,6,23,0.9)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+
+      {/* ══════════════════════════════════════════════════════════
+          HERO SECTION (Dark)
+         ══════════════════════════════════════════════════════════ */}
+      <div className="hero-section" style={{
+        padding: '1.25rem 1.25rem 1.5rem',
+        borderRadius: '0 0 1.75rem 1.75rem',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: '0.625rem',
-            background: 'linear-gradient(135deg, #10b981, #059669)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 12px rgba(16,185,129,0.3)',
-          }}>
-            <Wallet size={18} color="#fff" />
+        {/* Inner constraint wrapper */}
+        <div style={{ maxWidth: 480, margin: '0 auto', width: '100%' }}>
+
+        {/* Greeting Header */}
+        <header className="animate-fade-up" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginBottom: '1.5rem',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: 42, height: 42, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.1rem', fontWeight: 700, color: '#fff',
+              boxShadow: '0 2px 12px rgba(129,140,248,0.3)',
+            }}>👋</div>
+            <div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f1f5f9' }}>
+                Hi there!
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--hero-muted)' }}>
+                Track your finances
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="gradient-text" style={{ fontSize: '1rem', fontWeight: 800, lineHeight: 1.1 }}>
-              Budget Tracker
-            </div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>
-              Personal Finance
-            </div>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            style={{
+              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '50%', width: 40, height: 40,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'background 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            title="Settings"
+          >
+            <Settings size={18} color="var(--hero-muted)" />
+          </button>
+        </header>
+
+        {/* Balance Hero */}
+        <div className="animate-fade-up stagger-1" style={{ marginBottom: '1.25rem' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--hero-muted)', fontWeight: 500, marginBottom: '0.3rem' }}>
+            Track Your Financial Goals
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <span style={{
+              fontSize: '2.2rem', fontWeight: 800, color: '#f1f5f9',
+              letterSpacing: '-1px',
+            }}>
+              {balanceVisible ? formatPHP(netSavings) : '₱ ••••••'}
+            </span>
+            <button
+              onClick={() => setBalanceVisible(!balanceVisible)}
+              style={{
+                background: 'rgba(255,255,255,0.08)', border: 'none',
+                borderRadius: '50%', width: 30, height: 30,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              {balanceVisible
+                ? <Eye size={14} color="var(--hero-muted)" />
+                : <EyeOff size={14} color="var(--hero-muted)" />}
+            </button>
           </div>
         </div>
 
-        <button
-          onClick={() => setSettingsOpen(true)}
-          style={{
-            background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)',
-            borderRadius: '0.625rem', width: 38, height: 38,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(16,185,129,0.1)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-          title="Settings"
-        >
-          <Settings size={17} color="var(--text-secondary)" />
-        </button>
-      </header>
+        {/* Spending Limit Bar */}
+        <div className="animate-fade-up stagger-2" style={{
+          background: 'rgba(255,255,255,0.06)',
+          borderRadius: '0.875rem',
+          padding: '0.875rem 1rem',
+          marginBottom: '1.25rem',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--hero-muted)', fontWeight: 500 }}>
+              Weekly Limit
+            </span>
+            <span style={{ fontSize: '0.78rem', color: '#f1f5f9', fontWeight: 700 }}>
+              {formatPHP(limit)}
+            </span>
+          </div>
+          <div className="progress-bar" style={{ marginBottom: '0.35rem' }}>
+            <div className={`progress-fill ${spendStatus}`} style={{ width: `${spendPct}%` }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.68rem', color: 'var(--hero-muted)' }}>
+              Spent {formatPHP(weeklySpent)}
+            </span>
+            <span style={{
+              fontSize: '0.68rem', fontWeight: 600,
+              color: spendStatus === 'danger' ? '#f87171' : spendStatus === 'warning' ? '#fbbf24' : '#4ade80',
+            }}>
+              {weeklySpent > limit ? `${formatPHP(weeklySpent - limit)} over` : `${formatPHP(limit - weeklySpent)} left`}
+            </span>
+          </div>
+        </div>
 
-      {/* ── Scrollable Content ── */}
+        {/* Quick Actions Grid */}
+        <div className="animate-fade-up stagger-2" style={{
+          display: 'flex', justifyContent: 'space-between',
+          padding: '0 0.25rem',
+        }}>
+          <button className="action-btn" onClick={() => { setShowAllowanceModal(true); setAllowanceAmount(String(settings.weeklyAllowance)) }}>
+            <div className="action-icon">
+              <PlusCircle size={22} color="#a5b4fc" />
+            </div>
+            <span className="action-label">Add Money</span>
+          </button>
+
+          <button className="action-btn" onClick={() => setAccountsOpen(true)}>
+            <div className="action-icon">
+              <DollarSign size={22} color="#a5b4fc" />
+            </div>
+            <span className="action-label">Accounts</span>
+          </button>
+
+          <button className="action-btn" onClick={() => budgetRef.current?.scrollIntoView({ behavior: 'smooth' })}>
+            <div className="action-icon">
+              <Target size={22} color="#a5b4fc" />
+            </div>
+            <span className="action-label">Budget</span>
+          </button>
+
+          <button className="action-btn" onClick={() => historyRef.current?.scrollIntoView({ behavior: 'smooth' })}>
+            <div className="action-icon">
+              <Clock size={22} color="#a5b4fc" />
+            </div>
+            <span className="action-label">History</span>
+          </button>
+
+          <button className="action-btn" onClick={() => setSettingsOpen(true)}>
+            <div className="action-icon">
+              <LayoutGrid size={22} color="#a5b4fc" />
+            </div>
+            <span className="action-label">More</span>
+          </button>
+        </div>
+
+        </div>{/* end inner constraint */}
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+          LIGHT CONTENT SECTION
+         ══════════════════════════════════════════════════════════ */}
       <main style={{
         flex: 1,
-        overflowY: 'auto',
-        padding: '1rem',
+        padding: '1.25rem',
         paddingBottom: '6.5rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.875rem',
+        gap: '1.25rem',
         maxWidth: 480,
         width: '100%',
         margin: '0 auto',
       }}>
-        <NetSavingsCard settings={settings} transactions={transactions} />
 
-        {/* Got Allowance Button */}
-        <button
-          onClick={() => { setShowAllowanceModal(true); setAllowanceAmount(String(settings.weeklyAllowance)) }}
-          style={{
-            width: '100%',
-            background: 'linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.08))',
-            border: '1px dashed rgba(52,211,153,0.4)',
-            borderRadius: '0.875rem',
-            padding: '0.875rem 1.25rem',
-            display: 'flex', alignItems: 'center', gap: '0.75rem',
-            cursor: 'pointer', transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(52,211,153,0.15)'; e.currentTarget.style.borderColor = 'rgba(52,211,153,0.6)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.08))'; e.currentTarget.style.borderColor = 'rgba(52,211,153,0.4)' }}
-        >
-          <div style={{
-            width: 36, height: 36, borderRadius: '0.625rem',
-            background: 'rgba(16,185,129,0.2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.1rem',
-          }}>💰</div>
-          <div style={{ textAlign: 'left', flex: 1 }}>
-            <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#34d399' }}>
-              Got my allowance! 💸
-            </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-              Tap to record {formatPHP(settings.weeklyAllowance)} (or any amount)
-            </div>
-          </div>
-          <PlusCircle size={20} color="#34d399" />
-        </button>
-
-        <WeeklySpendingCard settings={settings} transactions={transactions} />
-
-        {/* History section */}
+        {/* Wallet Section */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <h2 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Transaction History
-            </h2>
-            <span style={{
-              fontSize: '0.7rem', color: 'var(--text-secondary)',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '999px', padding: '2px 8px',
-            }}>
-              {transactions.length} total
-            </span>
+          <div className="section-header">
+            <h2>Wallet</h2>
           </div>
-          <TransactionFeed transactions={transactions} onDelete={onDeleteTransaction} />
+          <WalletSection transactions={transactions} />
+        </div>
+
+        {/* My Accounts Section */}
+        {accounts.length > 0 && (
+          <div className="animate-fade-up stagger-4">
+            <div className="section-header">
+              <h2>My Accounts</h2>
+              <button className="see-all" onClick={() => setAccountsOpen(true)}>
+                Manage
+              </button>
+            </div>
+            <div className="card" style={{ padding: '0.25rem' }}>
+              {accounts.map((acc, i) => (
+                <div
+                  key={acc.id}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    padding: '0.75rem 0.875rem',
+                    borderBottom: i < accounts.length - 1 ? '1px solid var(--border-color)' : 'none',
+                  }}
+                >
+                  <AccountIcon name={acc.presetId || acc.name} size={36} />
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                      {acc.name}
+                    </p>
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                    {balanceVisible ? formatPHP(acc.balance) : '₱ ••••'}
+                  </span>
+                </div>
+              ))}
+              {/* Total row */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '0.75rem 0.875rem',
+                borderTop: '1px solid var(--border-color)',
+                background: 'var(--bg-input)',
+                borderRadius: '0 0 0.875rem 0.875rem',
+              }}>
+                <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  Total Net Worth
+                </span>
+                <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--accent)' }}>
+                  {balanceVisible ? formatPHP(netWorth) : '₱ ••••••'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* No Accounts Prompt */}
+        {accounts.length === 0 && (
+          <div className="animate-fade-up stagger-4">
+            <div className="section-header">
+              <h2>My Accounts</h2>
+            </div>
+            <button
+              onClick={() => setAccountsOpen(true)}
+              className="card"
+              style={{
+                width: '100%', padding: '1.5rem', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                gap: '0.5rem', border: '2px dashed var(--border-color)',
+                background: 'var(--bg-card)',
+                fontFamily: 'inherit',
+              }}
+            >
+              <div style={{
+                width: 48, height: 48, borderRadius: '50%',
+                background: 'var(--accent-glow)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <PlusCircle size={22} color="var(--accent)" />
+              </div>
+              <p style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                Add your accounts
+              </p>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                GCash, Maya, BPI, Cash, and more
+              </p>
+            </button>
+          </div>
+        )}
+
+        {/* Weekly Budget Card */}
+        <div ref={budgetRef}>
+          <div className="section-header">
+            <h2>Weekly Budget</h2>
+          </div>
+          <WeeklySpendingCard settings={settings} transactions={transactions} />
+        </div>
+
+        {/* Transaction History */}
+        <div ref={historyRef}>
+          <div className="section-header">
+            <h2>Latest Transactions</h2>
+            {transactions.length > 5 && (
+              <button className="see-all" onClick={() => setShowAllTransactions(!showAllTransactions)}>
+                {showAllTransactions ? 'Show Less' : 'See All'}
+              </button>
+            )}
+          </div>
+          <TransactionFeed
+            transactions={transactions}
+            onDelete={onDeleteTransaction}
+            limit={showAllTransactions ? undefined : 5}
+          />
         </div>
       </main>
 
@@ -177,11 +375,16 @@ export default function Dashboard({ settings, transactions, onUpdateSettings, on
         >
           <div className="dialog-content" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
-              <span style={{ fontSize: '1.4rem' }}>💰</span>
+              <div style={{
+                width: 40, height: 40, borderRadius: '50%',
+                background: 'var(--green-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '1.2rem',
+              }}>💰</div>
               <div>
-                <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Log Allowance Received</h2>
+                <h2 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Log Allowance</h2>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  How much did you receive today?
+                  How much did you receive?
                 </p>
               </div>
             </div>
@@ -206,7 +409,7 @@ export default function Dashboard({ settings, transactions, onUpdateSettings, on
                 />
               </div>
               {allowanceError && (
-                <p style={{ fontSize: '0.72rem', color: '#fb7185', marginTop: '0.3rem' }}>⚠ {allowanceError}</p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--red)', marginTop: '0.3rem' }}>⚠ {allowanceError}</p>
               )}
             </div>
 
@@ -226,14 +429,12 @@ export default function Dashboard({ settings, transactions, onUpdateSettings, on
 
             <button
               onClick={handleAddAllowance}
+              className="btn-primary"
               style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                color: '#fff', fontWeight: 700, border: 'none',
-                borderRadius: '0.625rem', padding: '0.8rem',
-                cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.95rem',
                 marginBottom: '0.6rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                boxShadow: '0 2px 8px rgba(34,197,94,0.3)',
               }}
             >
               💰 Add to My Savings
@@ -255,6 +456,14 @@ export default function Dashboard({ settings, transactions, onUpdateSettings, on
         settings={settings}
         onSave={onUpdateSettings}
         onReset={onReset}
+      />
+
+      {/* ── Net Worth Manager ── */}
+      <NetWorthManager
+        isOpen={accountsOpen}
+        onClose={() => setAccountsOpen(false)}
+        accounts={accounts}
+        onUpdateAccounts={onUpdateAccounts}
       />
     </div>
   )

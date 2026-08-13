@@ -31,7 +31,7 @@ function SettingsField({ label, fieldKey, form, errors, setForm, setErrors }) {
         />
       </div>
       {errors[fieldKey] && (
-        <p style={{ fontSize: '0.7rem', color: '#fb7185', marginTop: '0.25rem' }}>
+        <p style={{ fontSize: '0.7rem', color: 'var(--red)', marginTop: '0.25rem' }}>
           ⚠ {errors[fieldKey]}
         </p>
       )}
@@ -108,19 +108,19 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <div style={{
-              width: 32, height: 32, borderRadius: '0.5rem',
-              background: 'rgba(16,185,129,0.15)',
+              width: 36, height: 36, borderRadius: '0.625rem',
+              background: 'var(--accent-glow)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Settings size={16} color="#10b981" />
+              <Settings size={17} color="var(--accent)" />
             </div>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Settings</h2>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>Settings</h2>
           </div>
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)',
-              borderRadius: '50%', width: 30, height: 30,
+              background: 'var(--bg-input)', border: '1px solid var(--border-color)',
+              borderRadius: '50%', width: 32, height: 32,
               display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
             }}
           >
@@ -130,10 +130,13 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
 
         {/* Budget fields */}
         <div style={{
-          background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)',
-          borderRadius: '0.75rem', padding: '1rem', marginBottom: '1rem',
+          background: 'var(--bg-input)', border: '1px solid var(--border-color)',
+          borderRadius: '0.875rem', padding: '1rem', marginBottom: '1rem',
         }}>
-          <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <p style={{
+            fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)',
+            marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em',
+          }}>
             Budget Settings
           </p>
           <SettingsField label="Starting Savings Balance" fieldKey="startingBalance" form={form} errors={errors} setForm={setForm} setErrors={setErrors} />
@@ -143,10 +146,13 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
 
         {/* Categories */}
         <div style={{
-          background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)',
-          borderRadius: '0.75rem', padding: '1rem', marginBottom: '1rem',
+          background: 'var(--bg-input)', border: '1px solid var(--border-color)',
+          borderRadius: '0.875rem', padding: '1rem', marginBottom: '1rem',
         }}>
-          <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <p style={{
+            fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)',
+            marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em',
+          }}>
             Categories
           </p>
 
@@ -154,8 +160,9 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
             {DEFAULT_CATEGORIES.map(cat => (
               <span key={cat} style={{
-                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)',
-                borderRadius: '999px', padding: '3px 10px', fontSize: '0.75rem', color: 'var(--text-secondary)',
+                background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+                borderRadius: '999px', padding: '4px 12px', fontSize: '0.75rem',
+                color: 'var(--text-secondary)', fontWeight: 500,
               }}>
                 {cat}
               </span>
@@ -166,15 +173,15 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
           {form.customCategories.map(cat => (
             <div key={cat} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
-              borderRadius: '0.5rem', padding: '6px 10px', marginBottom: '0.4rem',
+              background: 'var(--accent-glow)', border: '1px solid rgba(79,70,229,0.15)',
+              borderRadius: '0.625rem', padding: '8px 12px', marginBottom: '0.4rem',
             }}>
-              <span style={{ fontSize: '0.8rem', color: '#34d399' }}>✦ {cat}</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600 }}>✦ {cat}</span>
               <button
                 onClick={() => removeCustomCategory(cat)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}
               >
-                <Trash2 size={13} color="#f43f5e" />
+                <Trash2 size={13} color="var(--red)" />
               </button>
             </div>
           ))}
@@ -193,12 +200,12 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
             <button
               type="button" onClick={addCategory}
               style={{
-                background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)',
-                borderRadius: '0.625rem', width: 40, flexShrink: 0, cursor: 'pointer',
+                background: 'var(--accent-glow)', border: '1px solid rgba(79,70,229,0.2)',
+                borderRadius: '0.75rem', width: 42, flexShrink: 0, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              <Plus size={17} color="#10b981" />
+              <Plus size={17} color="var(--accent)" />
             </button>
           </div>
         </div>
@@ -214,22 +221,22 @@ export default function SettingsDialog({ isOpen, onClose, settings, onSave, onRe
           </button>
         ) : (
           <div style={{
-            background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.3)',
-            borderRadius: '0.75rem', padding: '0.875rem', textAlign: 'center',
+            background: 'var(--red-bg)', border: '1px solid rgba(239,68,68,0.2)',
+            borderRadius: '0.875rem', padding: '0.875rem', textAlign: 'center',
           }}>
-            <p style={{ fontSize: '0.8rem', color: '#fb7185', marginBottom: '0.75rem', fontWeight: 600 }}>
-              ⚠ This will delete ALL transactions and settings. Are you sure?
+            <p style={{ fontSize: '0.8rem', color: 'var(--red)', marginBottom: '0.75rem', fontWeight: 600 }}>
+              ⚠ This will delete ALL data. Are you sure?
             </p>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
                 onClick={() => { onReset(); onClose() }}
                 style={{
-                  flex: 1, background: '#f43f5e', color: '#fff', border: 'none',
-                  borderRadius: '0.625rem', padding: '0.6rem', cursor: 'pointer',
+                  flex: 1, background: 'var(--red)', color: '#fff', border: 'none',
+                  borderRadius: '0.75rem', padding: '0.6rem', cursor: 'pointer',
                   fontWeight: 600, fontSize: '0.8rem', fontFamily: 'inherit',
                 }}
               >
-                Yes, Reset Everything
+                Yes, Reset
               </button>
               <button className="btn-ghost" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => setShowResetConfirm(false)}>
                 Cancel
