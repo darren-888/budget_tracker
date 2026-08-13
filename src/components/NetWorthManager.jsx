@@ -141,7 +141,7 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
             borderRadius: '50%', background: 'rgba(129,140,248,0.1)', pointerEvents: 'none',
           }} />
           <p style={{ fontSize: '0.78rem', color: 'var(--hero-muted)', marginBottom: '0.3rem', fontWeight: 500 }}>
-            Total Net Worth
+            Spendable Net Worth
           </p>
           <p style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f1f5f9' }}>
             {formatPHP(netWorth)}
