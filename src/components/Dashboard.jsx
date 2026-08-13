@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useRef } from 'react'
-import { Settings, PlusCircle, Wallet, Eye, EyeOff, Target, Clock, LayoutGrid, DollarSign } from 'lucide-react'
+import { Settings, PlusCircle, Wallet, Eye, EyeOff, Target, Clock, LayoutGrid, DollarSign, BarChart2 } from 'lucide-react'
 import { WalletSection, TransactionFeed } from './Cards'
 import QuickLogBar from './QuickLogBar'
 import SettingsDialog from './SettingsDialog'
+import AnalyticsDialog from './AnalyticsDialog'
 import NetWorthManager, { AccountIcon } from './NetWorthManager'
 import { DEFAULT_CATEGORIES } from '../utils/categories'
 import { formatPHP, getSpendStatus, computeWeeklySpent } from '../utils/calculations'
@@ -12,6 +13,7 @@ import { computeNetWorth, getAccountPreset } from '../utils/accounts'
 export default function Dashboard({ settings, transactions, accounts, onUpdateSettings, onAddTransaction, onDeleteTransaction, onUpdateAccounts, onReset }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [accountsOpen, setAccountsOpen] = useState(false)
+  const [analyticsOpen, setAnalyticsOpen] = useState(false)
   const [showAllowanceModal, setShowAllowanceModal] = useState(false)
   const [allowanceAmount, setAllowanceAmount] = useState(String(settings.weeklyAllowance))
   const [allowanceNote, setAllowanceNote] = useState('')
@@ -220,11 +222,11 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
             <span className="action-label">Accounts</span>
           </button>
 
-          <button className="action-btn" onClick={() => budgetRef.current?.scrollIntoView({ behavior: 'smooth' })}>
+          <button className="action-btn" onClick={() => setAnalyticsOpen(true)}>
             <div className="action-icon">
-              <Target size={22} color="#a5b4fc" />
+              <BarChart2 size={22} color="#a5b4fc" />
             </div>
-            <span className="action-label">Budget</span>
+            <span className="action-label">Analytics</span>
           </button>
 
           <button className="action-btn" onClick={() => historyRef.current?.scrollIntoView({ behavior: 'smooth' })}>
@@ -490,6 +492,14 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
         onClose={() => setAccountsOpen(false)}
         accounts={accounts}
         onUpdateAccounts={onUpdateAccounts}
+      />
+
+      {/* ── Analytics Dialog ── */}
+      <AnalyticsDialog
+        isOpen={analyticsOpen}
+        onClose={() => setAnalyticsOpen(false)}
+        transactions={transactions}
+        weeklyLimit={limit}
       />
     </div>
   )

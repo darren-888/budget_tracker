@@ -1,4 +1,5 @@
 // Financial calculation utilities
+import { getMondayOf } from './dateUtils'
 
 /**
  * Computes total net savings.
@@ -64,4 +65,38 @@ export function formatPHP(amount) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount)
+}
+
+/**
+ * Computes historical weekly spending analytics.
+ */
+export function computeWeeklyAnalytics(transactions) {
+  const weeklyTotals = {}
+  
+  transactions.filter(tx => tx.type === 'expense').forEach(tx => {
+    const date = new Date(tx.date)
+    const monday = getMondayOf(date)
+    const mondayStr = monday.toISOString()
+    
+    if (!weeklyTotals[mondayStr]) {
+      weeklyTotals[mondayStr] = 0
+    }
+    weeklyTotals[mondayStr] += Number(tx.amount)
+  })
+
+  // Convert to array and sort descending (newest first)
+  const analytics = Object.entries(weeklyTotals).map(([mondayStr, totalSpent]) => {
+    const weekStart = new Date(mondayStr)
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekStart.getDate() + 6)
+    weekEnd.setHours(23, 59, 59, 999)
+    return {
+      weekStart,
+      weekEnd,
+      totalSpent
+    }
+  })
+
+  analytics.sort((a, b) => b.weekStart - a.weekStart)
+  return analytics
 }
