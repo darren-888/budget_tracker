@@ -171,7 +171,7 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <AccountIcon name={acc.presetId || acc.name} size={38} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: acc.excludeFromTotal ? 'var(--text-secondary)' : 'var(--text-primary)', textDecoration: acc.excludeFromTotal ? 'line-through' : 'none' }}>
+                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: acc.excludeFromTotal ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
                           {acc.name}
                         </p>
                         {editingId === acc.id ? (
