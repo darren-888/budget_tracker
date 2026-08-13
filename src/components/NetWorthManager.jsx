@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { X, Plus, Trash2, Pencil, Check, DollarSign, Eye, EyeOff } from 'lucide-react'
-import { ACCOUNT_PRESETS, getAccountPreset, computeNetWorth } from '../utils/accounts'
+import { ACCOUNT_PRESETS, getAccountPreset, computeNetWorth, computeTotalNetWorth } from '../utils/accounts'
 import { formatPHP } from '../utils/calculations'
 
 function AccountIcon({ name, size = 40, presetData }) {
@@ -37,6 +37,7 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
   if (!isOpen) return null
 
   const netWorth = computeNetWorth(accounts)
+  const totalNetWorth = computeTotalNetWorth(accounts)
 
   // Presets not yet added
   const addedNames = accounts.map(a => a.presetId || a.name)
@@ -146,6 +147,24 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
           <p style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f1f5f9' }}>
             {formatPHP(netWorth)}
           </p>
+
+          {/* Only show raw total if it differs from spendable total */}
+          {totalNetWorth !== netWorth && (
+            <div className="animate-scale-in" style={{ 
+              display: 'inline-flex', alignItems: 'center', gap: '0.5rem', 
+              padding: '0.3rem 0.75rem', background: 'rgba(255,255,255,0.06)', 
+              borderRadius: '999px', marginTop: '0.2rem', marginBottom: '0.4rem',
+              border: '1px solid rgba(255,255,255,0.04)',
+            }}>
+              <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', fontWeight: 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Total Net Worth
+              </span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f1f5f9' }}>
+                {formatPHP(totalNetWorth)}
+              </span>
+            </div>
+          )}
+
           <p style={{ fontSize: '0.72rem', color: 'var(--hero-muted)', marginTop: '0.3rem' }}>
             Across {accounts.length} account{accounts.length !== 1 ? 's' : ''}
           </p>
