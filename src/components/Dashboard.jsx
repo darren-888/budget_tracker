@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { Settings, PlusCircle, Wallet, Eye, EyeOff, Target, Clock, LayoutGrid, DollarSign } from 'lucide-react'
-import { WalletSection, WeeklySpendingCard, TransactionFeed } from './Cards'
+import { WalletSection, TransactionFeed } from './Cards'
 import QuickLogBar from './QuickLogBar'
 import SettingsDialog from './SettingsDialog'
 import NetWorthManager, { AccountIcon } from './NetWorthManager'
@@ -21,7 +21,6 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
   const [showAllTransactions, setShowAllTransactions] = useState(false)
 
   const historyRef = useRef(null)
-  const budgetRef = useRef(null)
 
   const allCategories = [...DEFAULT_CATEGORIES, ...(settings.customCategories || [])]
 
@@ -352,13 +351,6 @@ export default function Dashboard({ settings, transactions, accounts, onUpdateSe
           </div>
         )}
 
-        {/* Weekly Budget Card */}
-        <div ref={budgetRef}>
-          <div className="section-header">
-            <h2>Weekly Budget</h2>
-          </div>
-          <WeeklySpendingCard settings={settings} transactions={transactions} />
-        </div>
 
         {/* Transaction History */}
         <div ref={historyRef}>
