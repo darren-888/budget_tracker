@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
@@ -6,11 +6,21 @@ import Dashboard from './components/Dashboard'
 const SETTINGS_KEY = 'budgettracker_settings'
 const TRANSACTIONS_KEY = 'budgettracker_transactions'
 const ACCOUNTS_KEY = 'budgettracker_accounts'
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 
 export default function App() {
   const [settings, setSettings] = useLocalStorage(SETTINGS_KEY, null)
   const [transactions, setTransactions] = useLocalStorage(TRANSACTIONS_KEY, [])
   const [accounts, setAccounts] = useLocalStorage(ACCOUNTS_KEY, [])
+
+  // Auto-purge transactions older than 30 days
+  useEffect(() => {
+    const cutoff = Date.now() - THIRTY_DAYS_MS
+    const fresh = transactions.filter(tx => new Date(tx.date).getTime() > cutoff)
+    if (fresh.length < transactions.length) {
+      setTransactions(fresh)
+    }
+  }, []) // runs once on mount
 
   const handleOnboardingComplete = (newSettings) => {
     setSettings(newSettings)
