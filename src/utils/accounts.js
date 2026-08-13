@@ -29,5 +29,8 @@ export function getAccountPreset(nameOrId) {
  * Compute total net worth from an array of accounts.
  */
 export function computeNetWorth(accounts) {
-  return accounts.reduce((sum, acc) => sum + Number(acc.balance || 0), 0)
+  return accounts.reduce((sum, acc) => {
+    if (acc.excludeFromTotal) return sum
+    return sum + Number(acc.balance || 0)
+  }, 0)
 }

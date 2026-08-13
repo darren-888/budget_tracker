@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Plus, Trash2, Pencil, Check, DollarSign } from 'lucide-react'
+import { X, Plus, Trash2, Pencil, Check, DollarSign, Eye, EyeOff } from 'lucide-react'
 import { ACCOUNT_PRESETS, getAccountPreset, computeNetWorth } from '../utils/accounts'
 import { formatPHP } from '../utils/calculations'
 
@@ -77,6 +77,10 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
 
   const handleDelete = (id) => {
     onUpdateAccounts(accounts.filter(a => a.id !== id))
+  }
+
+  const toggleExclude = (id, currentStatus) => {
+    onUpdateAccounts(accounts.map(a => a.id === id ? { ...a, excludeFromTotal: !currentStatus } : a))
   }
 
   const startEdit = (acc) => {
@@ -167,7 +171,7 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <AccountIcon name={acc.presetId || acc.name} size={38} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
+                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: acc.excludeFromTotal ? 'var(--text-secondary)' : 'var(--text-primary)', textDecoration: acc.excludeFromTotal ? 'line-through' : 'none' }}>
                           {acc.name}
                         </p>
                         {editingId === acc.id ? (
@@ -196,13 +200,21 @@ export default function NetWorthManager({ isOpen, onClose, accounts, onUpdateAcc
                             </button>
                           </div>
                         ) : (
-                          <p style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)', marginTop: '0.1rem' }}>
+                          <p style={{ fontWeight: 700, fontSize: '1rem', color: acc.excludeFromTotal ? 'var(--text-secondary)' : 'var(--text-primary)', marginTop: '0.1rem' }}>
                             {formatPHP(acc.balance)}
                           </p>
                         )}
                       </div>
                       {editingId !== acc.id && (
                         <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
+                          <button onClick={() => toggleExclude(acc.id, acc.excludeFromTotal)} style={{
+                            background: acc.excludeFromTotal ? 'var(--bg-input)' : 'rgba(79,70,229,0.08)', 
+                            border: acc.excludeFromTotal ? '1px solid var(--border-color)' : '1px solid rgba(79,70,229,0.2)',
+                            borderRadius: '0.5rem', width: 30, height: 30, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }} title={acc.excludeFromTotal ? 'Include in Net Worth' : 'Exclude from Net Worth'}>
+                            {acc.excludeFromTotal ? <EyeOff size={12} color="var(--text-secondary)" /> : <Eye size={12} color="var(--accent)" />}
+                          </button>
                           <button onClick={() => startEdit(acc)} style={{
                             background: 'var(--accent-glow)', border: '1px solid rgba(79,70,229,0.2)',
                             borderRadius: '0.5rem', width: 30, height: 30, cursor: 'pointer',
